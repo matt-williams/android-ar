@@ -56,6 +56,7 @@ public class CameraView extends GLSurfaceView implements Renderer {
     public void onPause() {
         if (mCamera != null) {
             mCamera.release();
+            mCamera = null;
         }
         super.onPause();
     }
@@ -72,7 +73,6 @@ public class CameraView extends GLSurfaceView implements Renderer {
         Utils.checkErrors("glEnable(GLES20.GL_BLEND)");
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         Utils.checkErrors("glBlendFunc");
-
     }
 
     @Override
@@ -90,7 +90,9 @@ public class CameraView extends GLSurfaceView implements Renderer {
         Utils.checkErrors("glDepthMask");
 
         mScreenTarget.renderTo();
-        mBillboard.render(getProjection());
+        if (mTexture != null) {
+            mBillboard.render(getProjection());
+        }
     }
 
     public Projection getProjection() {

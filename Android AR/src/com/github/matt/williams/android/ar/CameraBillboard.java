@@ -3,7 +3,6 @@ package com.github.matt.williams.android.ar;
 import android.content.res.Resources;
 import android.opengl.GLES20;
 
-import com.github.matt.williams.android.ar.R;
 import com.github.matt.williams.android.gl.FragmentShader;
 import com.github.matt.williams.android.gl.Program;
 import com.github.matt.williams.android.gl.Projection;

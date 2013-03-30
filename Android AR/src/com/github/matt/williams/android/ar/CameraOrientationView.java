@@ -31,10 +31,10 @@ public class CameraOrientationView extends CameraView {
 
     @Override
     public void onResume() {
+        super.onResume();
         if (mOrientationListener != null) {
-            super.onResume();
+            mOrientationListener.onResume();
         }
-        mOrientationListener.onResume();
     }
 
     @Override
