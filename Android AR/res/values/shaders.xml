@@ -1,0 +1,27 @@
+<resources>
+    
+<string name="cameraBillboardVertexShader"><![CDATA[
+attribute vec3 pos;
+attribute vec2 uv;
+uniform mat4 projection;
+uniform mat4 textureMatrix;
+varying highp vec2 uv2;
+
+void main() {
+  gl_Position = projection * vec4(pos, 1);
+  uv2 = (textureMatrix * vec4(uv, 0, 1)).xy;
+}
+]]></string>
+
+<string name="cameraBillboardFragmentShader"><![CDATA[
+#extension GL_OES_EGL_image_external : enable\n
+
+varying highp vec2 uv2;
+uniform samplerExternalOES texture;
+
+void main() {
+  gl_FragColor = texture2D(texture, uv2);
+}
+]]></string>
+
+</resources>
