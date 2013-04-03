@@ -48,7 +48,8 @@ public class CameraView extends GLSurfaceView implements Renderer {
         if (mCamera != null) {
             CameraUtils.setMaxPreviewSize(mCamera);
             Parameters params = mCamera.getParameters();
-            getProjection().setProjection(params.getHorizontalViewAngle(), params.getVerticalViewAngle());
+            // TODO: Remove hack for Sony phones that seem to report nonsense viewing angles
+            getProjection().setProjection(params.getHorizontalViewAngle() > 1.0f ? params.getHorizontalViewAngle() : 63.4f, params.getVerticalViewAngle() > 1.0f ? params.getVerticalViewAngle() : 49.6f);
         }
     }
 
@@ -109,5 +110,9 @@ public class CameraView extends GLSurfaceView implements Renderer {
 
     public ScreenTarget getScreenTarget() {
         return mScreenTarget;
+    }
+
+    public Camera getCamera() {
+        return mCamera;
     }
 }
