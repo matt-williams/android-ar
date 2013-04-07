@@ -6,7 +6,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.Parameters;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
@@ -45,11 +44,10 @@ public class CameraView extends GLSurfaceView implements Renderer {
     public void onResume() {
         super.onResume();
         mCamera = CameraUtils.getCamera(CameraInfo.CAMERA_FACING_BACK);
+        android.util.Log.e("ScreenTarget", "onResume: camera = " + mCamera);
         if (mCamera != null) {
             CameraUtils.setMaxPreviewSize(mCamera);
-            Parameters params = mCamera.getParameters();
-            // TODO: Remove hack for Sony phones that seem to report nonsense viewing angles
-            getProjection().setProjection(params.getHorizontalViewAngle() > 1.0f ? params.getHorizontalViewAngle() : 63.4f, params.getVerticalViewAngle() > 1.0f ? params.getVerticalViewAngle() : 49.6f);
+            CameraUtils.setProjection(mProjection, mCamera);
         }
     }
 
@@ -74,22 +72,27 @@ public class CameraView extends GLSurfaceView implements Renderer {
         Utils.checkErrors("glEnable(GLES20.GL_BLEND)");
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         Utils.checkErrors("glBlendFunc");
-    }
 
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        if (mCamera != null) {
-            mScreenTarget.set(width, height, CameraUtils.getAspectRatio(mCamera));
-        }
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         Utils.checkErrors("glDisable(GLES20.GL_DEPTH_TEST)");
         GLES20.glDepthMask(false);
         Utils.checkErrors("glDepthMask");
 
+        GLES20.glClearColor(0, 0, 0, 0);
+        Utils.checkErrors("glClearColor");
+    }
+
+    @Override
+    public void onSurfaceChanged(GL10 gl, int width, int height) {
+        android.util.Log.e("ScreenTarget", "onSurfaceChanged: camera = " + mCamera);
+        if (mCamera != null) {
+            mScreenTarget.set(width, height, CameraUtils.getPixelAspectRatio(mCamera));
+        }
+    }
+
+    @Override
+    public void onDrawFrame(GL10 gl) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mScreenTarget.renderTo();
         if (mTexture != null) {
             mBillboard.render(getProjection());
