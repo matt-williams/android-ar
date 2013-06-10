@@ -4,6 +4,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.opengl.GLES20;
@@ -48,6 +49,12 @@ public class CameraView extends GLSurfaceView implements Renderer {
         if (mCamera != null) {
             CameraUtils.setMaxPreviewSize(mCamera);
             CameraUtils.setProjection(mProjection, mCamera);
+            Rect rect = getHolder().getSurfaceFrame();
+            if ((rect.right != 0) &&
+                (rect.bottom != 0))
+            {
+                mScreenTarget.set(rect.right, rect.bottom, CameraUtils.getPixelAspectRatio(mCamera));
+            }
         }
     }
 
@@ -62,11 +69,8 @@ public class CameraView extends GLSurfaceView implements Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        if (mCamera != null) {
-            mTexture = new CameraTexture(mCamera);
-            mCamera.startPreview();
-        }
-        mBillboard = new CameraBillboard(getContext().getResources(), mTexture);
+        mTexture = null;
+        mBillboard = null;
 
         GLES20.glEnable(GLES20.GL_BLEND);
         Utils.checkErrors("glEnable(GLES20.GL_BLEND)");
@@ -78,13 +82,12 @@ public class CameraView extends GLSurfaceView implements Renderer {
         GLES20.glDepthMask(false);
         Utils.checkErrors("glDepthMask");
 
-        GLES20.glClearColor(0, 0, 0, 0);
+        GLES20.glClearColor(255, 0, 0, 0);
         Utils.checkErrors("glClearColor");
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        android.util.Log.e("ScreenTarget", "onSurfaceChanged: camera = " + mCamera);
         if (mCamera != null) {
             mScreenTarget.set(width, height, CameraUtils.getPixelAspectRatio(mCamera));
         }
@@ -92,11 +95,23 @@ public class CameraView extends GLSurfaceView implements Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        if ((mCamera != null) && (mTexture == null)) {
+            mTexture = new CameraTexture(mCamera);
+            mCamera.startPreview();
+        }
+        if ((mTexture != null) && (mBillboard == null)) {
+            mBillboard = createBillboard();
+        }
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mScreenTarget.renderTo();
         if (mTexture != null) {
-            mBillboard.render(getProjection());
+            mBillboard.render(getProjection(), mScreenTarget.getRect());
         }
+    }
+
+    public CameraBillboard createBillboard() {
+        return new CameraBillboard(getResources(), getTexture());
     }
 
     public Projection getProjection() {
