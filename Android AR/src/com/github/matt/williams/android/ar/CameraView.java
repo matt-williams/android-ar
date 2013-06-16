@@ -23,7 +23,7 @@ public class CameraView extends GLSurfaceView implements Renderer {
     private final ScreenTarget mScreenTarget = new ScreenTarget();
     private Projection mProjection = new Projection();
     private Texture mTexture;
-    private CameraBillboard mBillboard;
+    private Renderable mBillboard;
 
     public CameraView(Context context) {
         super(context);
@@ -106,11 +106,11 @@ public class CameraView extends GLSurfaceView implements Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mScreenTarget.renderTo();
         if (mTexture != null) {
-            mBillboard.render(getProjection(), mScreenTarget.getRect());
+            mBillboard.render(getProjection(), getProjection(), mScreenTarget.getRect());
         }
     }
 
-    public CameraBillboard createBillboard() {
+    public Renderable createBillboard() {
         return new CameraBillboard(getResources(), getTexture());
     }
 
