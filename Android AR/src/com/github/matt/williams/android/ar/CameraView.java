@@ -21,6 +21,7 @@ import com.github.matt.williams.android.gl.Utils;
 public class CameraView extends GLSurfaceView implements Renderer {
     private Camera mCamera;
     private final ScreenTarget mScreenTarget = new ScreenTarget();
+    private Projection mCameraProjection = new Projection();
     private Projection mProjection = new Projection();
     private Texture mTexture;
     private Renderable mBillboard;
@@ -48,6 +49,7 @@ public class CameraView extends GLSurfaceView implements Renderer {
         android.util.Log.e("ScreenTarget", "onResume: camera = " + mCamera);
         if (mCamera != null) {
             CameraUtils.setMaxPreviewSize(mCamera);
+            CameraUtils.setProjection(mCameraProjection, mCamera);
             CameraUtils.setProjection(mProjection, mCamera);
             Rect rect = getHolder().getSurfaceFrame();
             if ((rect.right != 0) &&
@@ -82,7 +84,7 @@ public class CameraView extends GLSurfaceView implements Renderer {
         GLES20.glDepthMask(false);
         Utils.checkErrors("glDepthMask");
 
-        GLES20.glClearColor(255, 0, 0, 0);
+        GLES20.glClearColor(0, 0, 0, 0);
         Utils.checkErrors("glClearColor");
     }
 
@@ -106,12 +108,20 @@ public class CameraView extends GLSurfaceView implements Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mScreenTarget.renderTo();
         if (mTexture != null) {
-            mBillboard.render(getProjection(), getProjection(), mScreenTarget.getRect());
+            mBillboard.render(getProjection(), getCameraProjection(), mScreenTarget.getRect());
         }
     }
 
     public Renderable createBillboard() {
         return new CameraBillboard(getResources(), getTexture());
+    }
+
+    public Projection getCameraProjection() {
+        return mCameraProjection;
+    }
+
+    public void setCameraProjection(Projection projection) {
+        this.mCameraProjection = projection;
     }
 
     public Projection getProjection() {

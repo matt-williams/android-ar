@@ -14,7 +14,7 @@ import com.github.matt.williams.android.gl.VertexShader;
 public class CameraBillboard implements Renderable {
     public final Program mProgram;
     public final Texture mTexture;
-    private static final float[] PROJECTED_VERTICES = new float[] {-1, -1, 1, -1, -1, 1, 1, 1};
+    public static final float[] PROJECTED_VERTICES = new float[] {-1, -1, 1, -1, -1, 1, 1, 1};
 
     public CameraBillboard(Program program, Texture texture) {
         mProgram = program;
@@ -44,6 +44,6 @@ public class CameraBillboard implements Renderable {
 
     @Override
     public void render(Projection projection, Projection camera, Rect rect) {
-        render(mProgram, mTexture, projection, projection, rect);
+        render(mProgram, mTexture, projection, camera, rect);
     }
 }

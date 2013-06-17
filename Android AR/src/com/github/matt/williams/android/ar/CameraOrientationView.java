@@ -11,22 +11,28 @@ public class CameraOrientationView extends CameraView {
 
     public CameraOrientationView(Context context) {
         super(context);
-        setProjection(new OrientationListener((SensorManager)context.getSystemService(Context.SENSOR_SERVICE)));
+        Projection projection = new OrientationListener((SensorManager)context.getSystemService(Context.SENSOR_SERVICE));
+        setProjection(projection);
+        setCameraProjection(projection);
     }
 
     public CameraOrientationView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setProjection(new OrientationListener((SensorManager)context.getSystemService(Context.SENSOR_SERVICE)));
+        Projection projection = new OrientationListener((SensorManager)context.getSystemService(Context.SENSOR_SERVICE));
+        setProjection(projection);
+        setCameraProjection(projection);
     }
 
     public CameraOrientationView(Context context, OrientationListener orientationListener) {
         super(context);
         setProjection(orientationListener);
+        setCameraProjection(orientationListener);
     }
 
     public CameraOrientationView(Context context, AttributeSet attrs, OrientationListener orientationListener) {
         super(context, attrs);
         setProjection(orientationListener);
+        setCameraProjection(orientationListener);
     }
 
     @Override
