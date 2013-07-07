@@ -31,9 +31,9 @@ public class CameraBillboard implements Renderable {
     public static void render(Program program, Texture texture, Projection camera, Projection projection, Rect rect) {
         program.setUniform("textureMatrix", texture.getTransformMatrix());
         program.setUniform("projection", projection.getViewMatrix());
-        final float[] mVertices = new float[12];
-        camera.inverseView(mVertices, 0, PROJECTED_VERTICES, 0, PROJECTED_VERTICES.length / 2);
-        program.setVertexAttrib("pos", mVertices, 3);
+        final float[] vertices = new float[12];
+        camera.inverseView(vertices, 0, PROJECTED_VERTICES, 0, PROJECTED_VERTICES.length / 2);
+        program.setVertexAttrib("pos", vertices, 3);
         program.setVertexAttrib("uv", new float[] {0, 0, 1, 0, 0, 1, 1, 1}, 2);
         program.setUniform("texture", 0);
         program.use();
