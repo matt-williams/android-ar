@@ -46,7 +46,6 @@ public class CameraView extends GLSurfaceView implements Renderer {
     public void onResume() {
         super.onResume();
         mCamera = CameraUtils.getCamera(CameraInfo.CAMERA_FACING_BACK);
-        android.util.Log.e("ScreenTarget", "onResume: camera = " + mCamera);
         if (mCamera != null) {
             CameraUtils.setMaxPreviewSize(mCamera);
             CameraUtils.setProjection(mCameraProjection, mCamera);
