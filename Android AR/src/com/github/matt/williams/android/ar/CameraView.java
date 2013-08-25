@@ -47,14 +47,16 @@ public class CameraView extends GLSurfaceView implements Renderer {
         super.onResume();
         mCamera = CameraUtils.getCamera(CameraInfo.CAMERA_FACING_BACK);
         if (mCamera != null) {
+            int orientation = getResources().getConfiguration().orientation;
+            CameraUtils.setOrientation(mCamera, orientation);
             CameraUtils.setMaxPreviewSize(mCamera);
-            CameraUtils.setProjection(mCameraProjection, mCamera);
-            CameraUtils.setProjection(mProjection, mCamera);
+            CameraUtils.setProjection(mCameraProjection, mCamera, orientation);
+            CameraUtils.setProjection(mProjection, mCamera, orientation);
             Rect rect = getHolder().getSurfaceFrame();
             if ((rect.right != 0) &&
                 (rect.bottom != 0))
             {
-                mScreenTarget.set(rect.right, rect.bottom, CameraUtils.getPixelAspectRatio(mCamera));
+                mScreenTarget.set(rect.right, rect.bottom, CameraUtils.getPixelAspectRatio(mCamera, orientation));
             }
         }
     }
@@ -90,7 +92,7 @@ public class CameraView extends GLSurfaceView implements Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         if (mCamera != null) {
-            mScreenTarget.set(width, height, CameraUtils.getPixelAspectRatio(mCamera));
+            mScreenTarget.set(width, height, CameraUtils.getPixelAspectRatio(mCamera, getResources().getConfiguration().orientation));
         }
     }
 

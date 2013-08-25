@@ -2,6 +2,7 @@ package com.github.matt.williams.android.ar;
 
 import java.util.List;
 
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -43,17 +44,33 @@ public final class CameraUtils {
         camera.setParameters(params);
     }
 
-    public static double getPixelAspectRatio(Camera camera) {
+    public static double getPixelAspectRatio(Camera camera, int orientation) {
         Size previewSize = camera.getParameters().getPreviewSize();
-        return (double)previewSize.width / previewSize.height;
+        switch (orientation) {
+        default:
+        case Configuration.ORIENTATION_LANDSCAPE:
+            return (double)previewSize.width / previewSize.height;
+
+        case Configuration.ORIENTATION_PORTRAIT:
+            return (double)previewSize.height / previewSize.width;
+        }
     }
 
     public static double getViewAngleAspectRatio(Camera camera) {
         return Math.tan(getSaneHorizontalViewAngle(camera) / 2 * Math.PI / 180) / Math.tan(getSaneVerticalViewAngle(camera) / 2 * Math.PI / 180);
     }
 
-    public static void setProjection(Projection projection, Camera camera) {
-        projection.setProjection(getSaneHorizontalViewAngle(camera), (float)(getSaneHorizontalViewAngle(camera) / getPixelAspectRatio(camera)));
+    public static void setProjection(Projection projection, Camera camera, int orientation) {
+        switch (orientation) {
+        default:
+        case Configuration.ORIENTATION_LANDSCAPE:
+            projection.setProjection(getSaneHorizontalViewAngle(camera), (float)(getSaneHorizontalViewAngle(camera) / getPixelAspectRatio(camera, orientation)), 90.0f - orientationToDegrees(orientation));
+            break;
+
+        case Configuration.ORIENTATION_PORTRAIT:
+            projection.setProjection((float)(getSaneHorizontalViewAngle(camera) * getPixelAspectRatio(camera, orientation)), getSaneHorizontalViewAngle(camera), 90.0f - orientationToDegrees(orientation));
+            break;
+        }
     }
 
     public static float getSaneHorizontalViewAngle(Camera camera) {
@@ -64,5 +81,20 @@ public final class CameraUtils {
     public static float getSaneVerticalViewAngle(Camera camera) {
         float vertViewAngle = camera.getParameters().getVerticalViewAngle();
         return ((vertViewAngle >= MINIMUM_VERTICAL_VIEW_ANGLE) && (vertViewAngle <= MAXIMUM_VERTICAL_VIEW_ANGLE)) ? vertViewAngle : DEFAULT_VERTICAL_VIEW_ANGLE;
+    }
+
+    public static void setOrientation(Camera camera, int orientation) {
+        camera.setDisplayOrientation(orientationToDegrees(orientation));
+    }
+
+    public static int orientationToDegrees(int orientation) {
+        switch (orientation) {
+        default:
+        case Configuration.ORIENTATION_LANDSCAPE:
+            return 0;
+
+        case Configuration.ORIENTATION_PORTRAIT:
+            return 90;
+        }
     }
 }
